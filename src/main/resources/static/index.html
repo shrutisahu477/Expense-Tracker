@@ -1,0 +1,607 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Expense Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f4f6fb;
+            padding: 30px;
+        }
+
+        .app {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #5b5ce2, #7b61ff);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(91, 92, 226, 0.25);
+        }
+
+        .header h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .card p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .card h2 {
+            color: #222;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .box h2 {
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #555;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 17px;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 17px;
+    outline: none;
+    font-size: 14px;
+    background: white;
+}
+
+select:focus {
+    border-color: #6c63ff;
+}
+
+        input:focus {
+            border-color: #6c63ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #6c63ff;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #554de0;
+        }
+        
+        .expense-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.expense-actions button {
+    width: auto;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 7px;
+}
+
+.expense-actions .amount {
+    margin-right: 5px;
+}
+
+.delete-btn {
+    background: #e05252;
+}
+
+.delete-btn:hover {
+    background: #c93f3f;
+}
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+
+        .expense-info h3 {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .expense-info span {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .amount {
+            font-weight: bold;
+            color: #e05252;
+        }
+
+        .empty {
+            text-align: center;
+            color: #999;
+            padding: 30px 0;
+        }
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="header">
+        <h1>💰 Expense Tracker</h1>
+        <p>Manage your daily expenses easily</p>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <p>Total Expenses</p>
+            <h2 id="totalAmount">₹0</h2>
+        </div>
+
+        <div class="card">
+            <p>Total Transactions</p>
+            <h2 id="totalTransactions">0</h2>
+        </div>
+
+        <div class="card">
+            <p>Average Expense</p>
+            <h2 id="averageAmount">₹0</h2>
+        </div>
+
+    </div>
+
+    <div class="main">
+
+        <div class="box">
+
+            <h2>Add Expense</h2>
+
+            <form id="expenseForm">
+
+                <label>Expense Title</label>
+                <input
+    type="text"
+    id="title"
+    placeholder="e.g. Lunch"
+    minlength="2"
+    required
+>
+
+                <label>Amount</label>
+                <input
+    type="number"
+    id="amount"
+    placeholder="e.g. 150"
+    min="1"
+    step="0.01"
+    required
+>
+
+                <label>Category</label>
+                <select id="category" required>
+    <option value="">Select category</option>
+    <option value="Food">🍔 Food</option>
+    <option value="Travel">🚗 Travel</option>
+    <option value="Shopping">🛍️ Shopping</option>
+    <option value="Bills">💡 Bills</option>
+    <option value="Education">📚 Education</option>
+    <option value="Entertainment">🎬 Entertainment</option>
+    <option value="Other">📦 Other</option>
+</select>
+
+                <button type="submit">
+                    + Add Expense
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="box">
+
+            <h2>Recent Expenses</h2>
+
+            <div id="expenseList">
+                <div class="empty">
+                    No expenses added yet.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    let expenses = [];
+
+    function loadExpenses() {
+
+        fetch("/expenses")
+            .then(response => response.json())
+            .then(data => {
+
+                expenses = data;
+
+                displayExpenses();
+
+            })
+            .catch(error => {
+
+                console.error("Error loading expenses:", error);
+
+            });
+    }
+
+
+    function displayExpenses() {
+
+        const list = document.getElementById("expenseList");
+
+        if (expenses.length === 0) {
+
+            list.innerHTML =
+                '<div class="empty">No expenses added yet.</div>';
+
+            updateSummary();
+
+            return;
+        }
+
+        list.innerHTML = "";
+
+        expenses.forEach(expense => {
+
+            const item = document.createElement("div");
+
+            item.className = "expense-item";
+
+            item.innerHTML = `
+
+                <div class="expense-info">
+
+                    <h3>${expense.description}</h3>
+
+                    <span>${expense.category} • ${expense.date}</span>
+
+                </div>
+
+                <div class="expense-actions">
+
+                <span class="amount">
+                    ₹${expense.amount}
+                </span>
+
+                <button onclick="editExpense(${expense.id})">
+                    Edit
+                </button>
+
+                <button class="delete-btn mt-5" onclick="deleteExpense(${expense.id})">
+                    Delete
+                </button>
+
+            </div>
+
+            `;
+
+            list.appendChild(item);
+
+        });
+
+        updateSummary();
+    }
+
+
+    function updateSummary() {
+
+        let total = 0;
+
+        expenses.forEach(expense => {
+
+            total += Number(expense.amount);
+
+        });
+
+        document.getElementById("totalAmount").innerText =
+            "₹" + total;
+
+        document.getElementById("totalTransactions").innerText =
+            expenses.length;
+
+        let average = expenses.length > 0
+            ? total / expenses.length
+            : 0;
+
+        document.getElementById("averageAmount").innerText =
+            "₹" + average.toFixed(2);
+    }
+
+
+    document.getElementById("expenseForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const title = document.getElementById("title").value.trim();
+            const amount = Number(document.getElementById("amount").value);
+            const category = document.getElementById("category").value;
+
+            if (title.length < 2) {
+                alert("Please enter a valid expense title.");
+                return;
+            }
+
+            if (amount <= 0) {
+                alert("Amount must be greater than 0.");
+                return;
+            }
+
+            if (category === "") {
+                alert("Please select a category.");
+                return;
+            }
+
+            const expense = {
+                description: title,
+                amount: amount,
+                category: category,
+                date: new Date().toISOString().split("T")[0]
+            };
+
+            fetch("/expenses", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(expense)
+
+            })
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Failed to add expense");
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                alert("Expense added successfully!");
+
+                document.getElementById("expenseForm").reset();
+
+                loadExpenses();
+
+            })
+
+            .catch(error => {
+
+                console.error("Error:", error);
+
+                alert("Failed to add expense.");
+
+            });
+
+        });
+    
+    function deleteExpense(id) {
+
+        fetch("/expenses/" + id, {
+            method: "DELETE"
+        })
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Failed to delete expense");
+            }
+
+            alert("Expense deleted successfully!");
+
+            loadExpenses();
+
+        })
+        .catch(error => {
+
+            console.error("Error:", error);
+
+            alert("Failed to delete expense.");
+
+        });
+    }
+    
+    function editExpense(id) {
+
+        const expense = expenses.find(e => e.id === id);
+
+        if (!expense) {
+            alert("Expense not found");
+            return;
+        }
+
+        const description = prompt(
+            "Enter expense title:",
+            expense.description
+        );
+
+        if (description === null) {
+            return;
+        }
+
+        const amount = prompt(
+            "Enter amount:",
+            expense.amount
+        );
+
+        if (amount === null) {
+            return;
+        }
+
+        const category = prompt(
+            "Enter category:",
+            expense.category
+        );
+
+        if (category === null) {
+            return;
+        }
+
+        const updatedExpense = {
+
+            description: description,
+
+            amount: Number(amount),
+
+            category: category,
+
+            date: expense.date
+        };
+
+        fetch("/expenses/" + id, {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(updatedExpense)
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Failed to update expense");
+            }
+
+            return response.json();
+
+        })
+
+        .then(data => {
+
+            alert("Expense updated successfully!");
+
+            loadExpenses();
+
+        })
+
+        .catch(error => {
+
+            console.error("Error:", error);
+
+            alert("Failed to update expense.");
+
+        });
+    }
+
+
+    loadExpenses();
+
+</script>
+
+</body>
+</html>
+
